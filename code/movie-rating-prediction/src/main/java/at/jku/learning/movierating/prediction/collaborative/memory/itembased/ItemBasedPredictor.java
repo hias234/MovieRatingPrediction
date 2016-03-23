@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import at.jku.learning.movierating.model.Rating;
@@ -17,6 +16,7 @@ public class ItemBasedPredictor implements Predictor {
 
 	private List<Rating> trainingSet;
 	private Map<Long, Double> userRatingAverages;
+	private Map<Map.Entry<Long, Long>, Double> itemSimilarityCache;
 	private Map<Long, List<Rating>> trainingSetByItemId;
 	private Map<Long, List<Rating>> trainingSetByUserId;
 	private Integer highestSimilarityItemOffset; // in slides = k
@@ -25,6 +25,7 @@ public class ItemBasedPredictor implements Predictor {
 		super();
 		this.trainingSet = trainingSet;
 		this.userRatingAverages = new HashMap<>();
+		this.itemSimilarityCache = new HashMap<>();
 		this.trainingSetByItemId = this.trainingSet.stream().collect(Collectors.groupingBy(i -> i.getMovieId()));
 		this.trainingSetByUserId = this.trainingSet.stream().collect(Collectors.groupingBy(i -> i.getUserId()));
 		this.highestSimilarityItemOffset = highestSimilarityItemOffset;
@@ -57,16 +58,16 @@ public class ItemBasedPredictor implements Predictor {
 		return a / b;
 	}
 
-	private Map<Long, Double> getMostSimilarItems(Long movieId, Long userId) {
+	private Map<Long, Double> getMostSimilarItems(Long unknownItemId, Long userId) {
 		List<Rating> userRatings = trainingSetByUserId.get(userId);
 		
-		List<Rating> ratings1 = trainingSetByItemId.get(movieId);
+		List<Rating> ratings1 = trainingSetByItemId.get(unknownItemId);
 		
 		List<Map.Entry<Long, Double>> similarItems = new ArrayList<>();
 		for (Long item : trainingSetByItemId.keySet()) {
-			if (!item.equals(movieId) && userRatings.stream().anyMatch(r -> r.getMovieId().equals(item))) {
+			if (!item.equals(unknownItemId) && userRatings.stream().anyMatch(r -> r.getMovieId().equals(item))) {
 				List<Rating> ratings2 = trainingSetByItemId.get(item);
-				Double similarity = calculateSimilarity(ratings1, ratings2);
+				Double similarity = calculateSimilarity(unknownItemId, ratings1, item, ratings2);
 				
 				similarItems.add(new AbstractMap.SimpleEntry<>(item, similarity));
 			}
@@ -81,7 +82,12 @@ public class ItemBasedPredictor implements Predictor {
 	/**
 	 * formula slide 26
 	 */
-	protected Double calculateSimilarity(List<Rating> ratings1, List<Rating> ratings2) {
+	protected Double calculateSimilarity(Long itemId1, List<Rating> ratings1, Long itemId2, List<Rating> ratings2) {
+		Double cachedSimilarity = itemSimilarityCache.get(new AbstractMap.SimpleEntry<>(itemId1, itemId2));
+		if (cachedSimilarity != null) {
+			return cachedSimilarity;
+		}
+		
 		Set<Long> userBase = getUserBase(ratings1, ratings2);
 		
 		Double a = 0.0;
@@ -98,7 +104,12 @@ public class ItemBasedPredictor implements Predictor {
 			b2 += (rating2 - userBaseAverage) * (rating2 - userBaseAverage);
 		}
 
-		return a / (Math.sqrt(b1) * Math.sqrt(b2));
+		Double similarity = a / (Math.sqrt(b1) * Math.sqrt(b2));
+		
+		itemSimilarityCache.put(new AbstractMap.SimpleEntry<>(itemId1, itemId2), similarity);
+		itemSimilarityCache.put(new AbstractMap.SimpleEntry<>(itemId2, itemId1), similarity);
+		
+		return similarity;
 	}
 
 	private Double calculateUserBaseAverage(Long userId) {
