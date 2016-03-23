@@ -1,5 +1,7 @@
 package at.jku.learning.movierating.prediction.collaborative.memory.itembased;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +43,6 @@ public class ItemBasedPredictorTest {
 		ItemBasedPredictor predictor = new ItemBasedPredictor(ratings, 2);
 		Double prediction = predictor.predictRating(5L, 5L);
 		
-		System.out.println(prediction);
+		assertEquals(4.54, prediction, 0.01);
 	}
 }
