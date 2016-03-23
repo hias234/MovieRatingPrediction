@@ -15,10 +15,10 @@ public class Main {
 		List<Rating> trainingData = reader.readRatings(Main.class.getResourceAsStream("/training.dat"));
 		
 		ItemBasedPredictor predictor = new ItemBasedPredictor(20);
-		PredictorTester tester = new PredictorTester(trainingData, 0.9);
+		PredictorTester tester = new PredictorTester(trainingData, 0.9999);
 		
 		Double rsme = tester.calculateRSME(predictor);
-		System.out.println(rsme);
+		System.out.println("RMSE " + rsme);
 	}
 	
 }
