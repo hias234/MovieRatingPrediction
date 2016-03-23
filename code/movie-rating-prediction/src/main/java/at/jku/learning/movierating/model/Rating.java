@@ -5,6 +5,17 @@ public class Rating {
 	private Long movieId;
 	private Integer rating;
 
+	public Rating() {
+		super();
+	}
+
+	public Rating(Long userId, Long movieId, Integer rating) {
+		super();
+		this.userId = userId;
+		this.movieId = movieId;
+		this.rating = rating;
+	}
+
 	public Long getUserId() {
 		return userId;
 	}
@@ -58,6 +69,11 @@ public class Rating {
 		} else if (!userId.equals(other.userId))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Rating [userId=" + userId + ", movieId=" + movieId + ", rating=" + rating + "]";
 	}
 
 	
