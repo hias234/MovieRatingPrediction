@@ -16,6 +16,7 @@ import at.jku.learning.movierating.prediction.Predictor;
 public class ItemBasedPredictor implements Predictor {
 
 	private List<Rating> trainingSet;
+	private Map<Long, Double> userRatingAverages;
 	private Map<Long, List<Rating>> trainingSetByItemId;
 	private Map<Long, List<Rating>> trainingSetByUserId;
 	private Integer highestSimilarityItemOffset; // in slides = k
@@ -23,13 +24,14 @@ public class ItemBasedPredictor implements Predictor {
 	public ItemBasedPredictor(List<Rating> trainingSet, Integer highestSimilarityItemOffset) {
 		super();
 		this.trainingSet = trainingSet;
-		this.trainingSetByItemId = trainingSet.stream().collect(Collectors.groupingBy(i -> i.getMovieId()));
-		this.trainingSetByUserId = trainingSet.stream().collect(Collectors.groupingBy(i -> i.getUserId()));
+		this.userRatingAverages = new HashMap<>();
+		this.trainingSetByItemId = this.trainingSet.stream().collect(Collectors.groupingBy(i -> i.getMovieId()));
+		this.trainingSetByUserId = this.trainingSet.stream().collect(Collectors.groupingBy(i -> i.getUserId()));
 		this.highestSimilarityItemOffset = highestSimilarityItemOffset;
 
 		init();
 	}
-
+	
 	private void init() {
 		// precalculate everything needed to precalculate
 	}
@@ -99,9 +101,13 @@ public class ItemBasedPredictor implements Predictor {
 		return a / (Math.sqrt(b1) * Math.sqrt(b2));
 	}
 
-	// TODO make better solution...
 	private Double calculateUserBaseAverage(Long userId) {
-		return trainingSetByUserId.get(userId).stream().mapToInt(r -> r.getRating()).average().getAsDouble();
+		Double userRatingAverage = userRatingAverages.get(userId);
+		if (userRatingAverage == null) {
+			userRatingAverage = trainingSetByUserId.get(userId).stream().mapToInt(r -> r.getRating()).average().getAsDouble();
+			userRatingAverages.put(userId, userRatingAverage);
+		}
+		return userRatingAverage;
 	}
 
 	/**
