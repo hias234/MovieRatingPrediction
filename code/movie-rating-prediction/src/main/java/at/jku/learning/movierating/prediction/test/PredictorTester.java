@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import at.jku.learning.movierating.model.Rating;
+import at.jku.learning.movierating.prediction.PrecisePredictor;
 import at.jku.learning.movierating.prediction.Predictor;
 
 public class PredictorTester {
@@ -26,13 +27,13 @@ public class PredictorTester {
 		this.testSet = ratings.subList(trainingSetCount + 1, ratings.size() - 1);
 	}
 	
-	public Double calculateRSME(Predictor predictor) {
+	public Double calculateRSME(PrecisePredictor predictor) {
 		predictor.setTrainingSet(trainingSet);
 		
-		Double innerSum = 0.0;
+		Integer innerSum = 0;
 		int i = 0;
 		for (Rating rating : testSet) {
-			Double predictedRating = predictor.predictRating(rating.getUserId(), rating.getMovieId());
+			Integer predictedRating = predictor.predictRating(rating.getUserId(), rating.getMovieId());
 			innerSum += (predictedRating - rating.getRating()) * (predictedRating - rating.getRating());
 			
 			System.out.println((i++) + "  Real Rating: " + rating.getRating() + ", predicted: " + predictedRating);
