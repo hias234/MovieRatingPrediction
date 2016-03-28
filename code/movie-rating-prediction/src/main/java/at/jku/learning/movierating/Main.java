@@ -14,7 +14,7 @@ public class Main {
 		MovieRatingReader reader = new MovieRatingReader();
 		List<Rating> trainingData = reader.readRatings(Main.class.getResourceAsStream("/training.dat"));
 		
-		ItemBasedPredictor predictor = new ItemBasedPredictor(20);
+		ItemBasedPredictor predictor = new ItemBasedPredictor(50);
 		PredictorTester tester = new PredictorTester(trainingData, 0.9999);
 		
 		Double rsme = tester.calculateRSME(predictor);
