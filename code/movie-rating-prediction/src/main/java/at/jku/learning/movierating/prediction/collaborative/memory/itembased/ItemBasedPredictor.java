@@ -112,7 +112,7 @@ public class ItemBasedPredictor implements Predictor {
 
 		// TODO check if isEmptyCheck is right and how to handle this case
 		Double b = (Math.sqrt(b1) * Math.sqrt(b2));
-		Double similarity = userBase.isEmpty() || b == 0.0 ? 0.0 : a / b;
+		Double similarity = userBase.isEmpty() || b == 0.0 ? 1.0 : a / b;
 
 		itemSimilarityCache.put(new AbstractMap.SimpleEntry<>(itemId1, itemId2), similarity);
 		itemSimilarityCache.put(new AbstractMap.SimpleEntry<>(itemId2, itemId1), similarity);

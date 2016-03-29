@@ -4,18 +4,18 @@ import java.util.List;
 
 import at.jku.learning.movierating.model.Rating;
 
-public class MathRoundPrecisePredictor implements PrecisePredictor {
-
+public class TruncatePrecisePredictor implements PrecisePredictor {
+	
 	private Predictor predictor;
 	
-	public MathRoundPrecisePredictor(Predictor predictor) {
+	public TruncatePrecisePredictor(Predictor predictor) {
 		this.predictor = predictor;
 	}
 
 	@Override
 	public Integer predictRating(Long userId, Long movieId) {
 		Double rating = predictor.predictRating(userId, movieId);
-		Integer numberRating = Long.valueOf(Math.round(rating)).intValue();
+		Integer numberRating = rating.intValue();
 		
 		return Math.min(Math.max(1, numberRating), 5);
 	}

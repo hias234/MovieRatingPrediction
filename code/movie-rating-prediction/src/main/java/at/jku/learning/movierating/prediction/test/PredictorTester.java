@@ -1,8 +1,12 @@
 package at.jku.learning.movierating.prediction.test;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import at.jku.learning.movierating.model.Rating;
 import at.jku.learning.movierating.prediction.PrecisePredictor;
@@ -40,5 +44,20 @@ public class PredictorTester {
 		}
 		
 		return Math.sqrt(1.0 / testSet.size() * innerSum);
+	}
+	
+	public List<Map.Entry<PrecisePredictor, Double>> comparePredictors(PrecisePredictor... predictors) {
+		List<Map.Entry<PrecisePredictor, Double>> result = new ArrayList<>();
+		
+		for (PrecisePredictor predictor : predictors) {
+			Double rsme = calculateRSME(predictor);
+			
+			result.add(new AbstractMap.SimpleEntry<PrecisePredictor, Double>(predictor, rsme));
+		}
+		
+		result = result.stream().sorted((p1, p2) -> p1.getValue().compareTo(p2.getValue()))
+					   .collect(Collectors.toList());
+		
+		return result;
 	}
 }

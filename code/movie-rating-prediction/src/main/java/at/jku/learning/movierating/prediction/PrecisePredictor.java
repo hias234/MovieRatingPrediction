@@ -9,4 +9,6 @@ public interface PrecisePredictor {
 	Integer predictRating(Long userId, Long movieId);
 
 	void setTrainingSet(List<Rating> trainingSet);
+	
+	Predictor getPredictor();
 }
