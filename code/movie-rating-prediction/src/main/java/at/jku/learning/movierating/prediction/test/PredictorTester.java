@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 import at.jku.learning.movierating.model.Rating;
 import at.jku.learning.movierating.prediction.PrecisePredictor;
-import at.jku.learning.movierating.prediction.Predictor;
 
 public class PredictorTester {
 
