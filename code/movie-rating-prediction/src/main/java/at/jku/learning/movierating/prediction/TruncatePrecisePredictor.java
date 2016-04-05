@@ -32,4 +32,9 @@ public class TruncatePrecisePredictor implements PrecisePredictor {
 	public void setPredictor(Predictor predictor) {
 		this.predictor = predictor;
 	}
+	
+	@Override
+	public String toString() {
+		return "Truncate " + predictor.toString();
+	}
 }

@@ -39,7 +39,7 @@ public class PredictorTester {
 			Integer predictedRating = predictor.predictRating(rating.getUserId(), rating.getMovieId());
 			innerSum += (predictedRating - rating.getRating()) * (predictedRating - rating.getRating());
 			
-			System.out.println((i++) + "  Real Rating: " + rating.getRating() + ", predicted: " + predictedRating);
+			System.out.println(predictor + " " + (i++) + "  Real Rating: " + rating.getRating() + ", predicted: " + predictedRating);
 		}
 		
 		return Math.sqrt(1.0 / testSet.size() * innerSum);
