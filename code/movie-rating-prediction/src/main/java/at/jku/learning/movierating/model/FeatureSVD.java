@@ -63,7 +63,7 @@ public class FeatureSVD {
     }
     
     for (Map.Entry<Long, Double> singleItemFeature : itemFeature.entrySet()) {
-      builder.append("Item: " + singleItemFeature.getKey() + " | Value: " +singleItemFeature.getValue() + "\n");
+      builder.append("Item: " + singleItemFeature.getKey() + " | Value: " +getItemFeature(singleItemFeature.getKey()) + "\n");
     }
     
     return builder.toString();
