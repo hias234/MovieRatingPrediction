@@ -1,6 +1,5 @@
 package at.jku.learning.movierating.prediction.test;
 
-import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +26,7 @@ public class ConfigTester {
 		this.out = out;
 	}
 	
-	public List<Entry<PrecisePredictor, Double>> testConfigs(PredictorTester tester, PrecisePredictor... predictors) throws IOException, InterruptedException, ExecutionException {
+	public List<Entry<PrecisePredictor, Double>> testConfigs(PredictorTester tester, PrecisePredictor... predictors) {
 		long startTime = System.currentTimeMillis();
 		
 		int threadPoolSize = Runtime.getRuntime().availableProcessors();
@@ -42,11 +41,21 @@ public class ConfigTester {
 			FutureTask<List<Map.Entry<PrecisePredictor, Double>>> task = new FutureTask<>(new Callable<List<Map.Entry<PrecisePredictor, Double>>>() {
 				@Override
 				public List<Entry<PrecisePredictor, Double>> call() throws Exception {
-					List<Entry<PrecisePredictor, Double>> data = tester.comparePredictors(p);
+					List<Entry<PrecisePredictor, Double>> data = null;
+					// make sure we don't crash; if there is an exception, just exclude this
+					// predictor by returning null
+					Exception ex = null;
+					try {
+						data = tester.comparePredictors(p);
+					} catch (Exception e) {
+						data = null;
+						ex = e;
+					}
 					doneTasks.incrementAndGet();
 					if (out != null) {
-						out.println("ConfigTester: " + doneTasks + "/" + predictors.length);
+						out.println("ConfigTester: " + doneTasks + "/" + predictors.length + (data == null ? " - failed: " + ex : ""));
 					}
+					// null in case of exception
 					return data;
 				}
 			});
@@ -56,7 +65,17 @@ public class ConfigTester {
         
         List<Map.Entry<PrecisePredictor, Double>> result = new ArrayList<>();
 		for (FutureTask<List<Map.Entry<PrecisePredictor, Double>>> task : tasks) {
-			result.addAll(task.get());
+			List<Entry<PrecisePredictor, Double>> singleResult = null;
+			try {
+				singleResult = task.get();
+			} catch (InterruptedException | ExecutionException e) {
+				singleResult = null;
+			}
+			// only add the result if it completed successfully (that is, the call "task.get()"
+			// itself succeeded as well the executed code ---> see comment above)
+			if (singleResult != null) {
+				result.addAll(singleResult);
+			}
 		}
         executor.shutdown();
         

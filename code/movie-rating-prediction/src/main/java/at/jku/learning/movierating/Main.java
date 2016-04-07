@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import at.jku.learning.movierating.model.Rating;
 import at.jku.learning.movierating.plot.GnuPlot;
@@ -55,7 +54,7 @@ public class Main {
 			new MathRoundPrecisePredictor(new CombinedMeanPredictor(Arrays.asList(new ItemBasedPredictor(50), new UserBasedPredictor(50))))
 	};
 
-	public static void main(String[] args) throws IOException, InterruptedException, ExecutionException {
+	public static void main(String[] args) throws IOException {
 		MovieRatingReader reader = new MovieRatingReader();
 		List<Rating> trainingData = reader.readRatings(Main.class.getResourceAsStream("/training.dat"));
 		// change if output is to be stored e.g. in a file
