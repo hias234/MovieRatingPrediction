@@ -1,6 +1,5 @@
 package at.jku.learning.movierating.prediction.collaborative.model.svd;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -78,7 +77,6 @@ public class SingularValueDecompositionPredictor implements Predictor {
     FeatureSVD feature;
     featureSet = new HashSet<FeatureSVD>();
     computePreTrain();
-    Collections.shuffle(trainingSet);
     
     for (int featureRank=1; featureRank <= this.featureLimit; ++featureRank) {
       feature = new FeatureSVD(featureRank); //Create new Feature

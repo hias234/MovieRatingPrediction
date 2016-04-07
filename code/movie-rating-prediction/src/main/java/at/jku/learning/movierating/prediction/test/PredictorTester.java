@@ -34,8 +34,8 @@ public class PredictorTester {
 		assert percentageTrainingData > 0.0 && percentageTrainingData < 1.0;
 		
 		Integer trainingSetCount = Double.valueOf(ratings.size() * percentageTrainingData).intValue();
-		this.trainingSet = ratings.subList(0, trainingSetCount);
-		this.testSet = ratings.subList(trainingSetCount + 1, ratings.size() - 1);
+		this.trainingSet = Collections.unmodifiableList(ratings.subList(0, trainingSetCount));
+		this.testSet = Collections.unmodifiableList(ratings.subList(trainingSetCount + 1, ratings.size() - 1));
 	}
 	
 	public Double calculateRSME(PrecisePredictor predictor) {
