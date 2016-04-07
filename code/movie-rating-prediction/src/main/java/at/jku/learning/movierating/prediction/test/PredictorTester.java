@@ -39,7 +39,12 @@ public class PredictorTester {
 	}
 	
 	public Double calculateRSME(PrecisePredictor predictor) {
-		predictor.setTrainingSet(trainingSet);
+		// make a deep copy of the training data set to avoid concurrency problems
+		List<Rating> copiedTrainingData = new ArrayList<>(trainingSet.size());
+		for (Rating r : trainingSet) {
+			copiedTrainingData.add(r.clone());
+		}
+		predictor.setTrainingSet(copiedTrainingData);
 		
 		Integer innerSum = 0;
 		int i = 0;

@@ -1,6 +1,6 @@
 package at.jku.learning.movierating.model;
 
-public class Rating {
+public class Rating implements Cloneable {
 	private Long userId;
 	private Long movieId;
 	private Integer rating;
@@ -75,6 +75,13 @@ public class Rating {
 	public String toString() {
 		return "Rating [userId=" + userId + ", movieId=" + movieId + ", rating=" + rating + "]";
 	}
-
+	
+	@Override
+	public Rating clone() {
+		long clonedUserId = this.userId.longValue();
+		long clonedMovieId = this.movieId.longValue();
+		int clonedRating = this.rating.intValue();
+		return new Rating(clonedUserId, clonedMovieId, clonedRating);
+	}
 	
 }
