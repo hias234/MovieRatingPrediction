@@ -1,5 +1,6 @@
 package at.jku.learning.movierating.prediction.test;
 
+import java.io.PrintStream;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,10 +18,17 @@ public class PredictorTester {
 	
 	private List<Rating> trainingSet;
 	private List<Rating> testSet;
+
+	private final PrintStream out;
 	
 	public PredictorTester(List<Rating> ratings, Double percentageTrainingData, Random rnd) {
+		this(ratings, percentageTrainingData, rnd, null);
+	}
+	
+	public PredictorTester(List<Rating> ratings, Double percentageTrainingData, Random rnd, PrintStream out) {
 		super();
 		this.ratings = ratings;
+		this.out = out;
 		Collections.shuffle(this.ratings, rnd);
 		
 		assert percentageTrainingData > 0.0 && percentageTrainingData < 1.0;
@@ -39,7 +47,10 @@ public class PredictorTester {
 			Integer predictedRating = predictor.predictRating(rating.getUserId(), rating.getMovieId());
 			innerSum += (predictedRating - rating.getRating()) * (predictedRating - rating.getRating());
 			
-			System.out.println(predictor + " " + (i++) + "  Real Rating: " + rating.getRating() + ", predicted: " + predictedRating);
+			if (out != null) {
+//				out.println(predictor + " " + (i++) + "  Real Rating: " + rating.getRating() + ", predicted: " + predictedRating);
+				out.println("PredictorTester: " + predictor + ": " + (++i) + "/" + testSet.size());
+			}
 		}
 		
 		return Math.sqrt(1.0 / testSet.size() * innerSum);
