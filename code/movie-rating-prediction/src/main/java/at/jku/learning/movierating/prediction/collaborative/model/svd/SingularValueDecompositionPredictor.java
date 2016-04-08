@@ -26,6 +26,7 @@ public class SingularValueDecompositionPredictor implements Predictor {
   private Map<Long, Double> userOffsetMap;
   private final int cycles;
   private final int featureLimit;
+  private final int meanMultiplier;
   private final Double learningRate;
   private final Double regularizationTerm;
 
@@ -35,6 +36,7 @@ public class SingularValueDecompositionPredictor implements Predictor {
     this.learningRate = ParameterSVD.INSTANCE.learningRate;
     this.featureLimit = ParameterSVD.INSTANCE.featureLimit;
     this.regularizationTerm = ParameterSVD.INSTANCE.regularizationTerm;
+    this.meanMultiplier = ParameterSVD.INSTANCE.meanMultiplier;
   }
   
   public SingularValueDecompositionPredictor(int cycles) {
@@ -42,13 +44,19 @@ public class SingularValueDecompositionPredictor implements Predictor {
     this.learningRate = ParameterSVD.INSTANCE.learningRate;
     this.featureLimit = ParameterSVD.INSTANCE.featureLimit;
     this.regularizationTerm = ParameterSVD.INSTANCE.regularizationTerm;
+    this.meanMultiplier = ParameterSVD.INSTANCE.meanMultiplier;
   } 
   
-  public SingularValueDecompositionPredictor(int cycles, Double learningRate, int featureLimit) {
+  public SingularValueDecompositionPredictor(int cycles, 
+                                             Double learningRate, 
+                                             int featureLimit, 
+                                             int meanMultiplier) {
     this.cycles = cycles;
     this.learningRate = learningRate;
     this.featureLimit = featureLimit;
+    this.meanMultiplier = meanMultiplier;
     this.regularizationTerm = ParameterSVD.INSTANCE.regularizationTerm;
+     
   }
 
   @Override
@@ -113,6 +121,7 @@ public class SingularValueDecompositionPredictor implements Predictor {
   }
   
   private Double getBaseline(Long movieId, Long userId) {
+    //What if movie does not exist
     return movieMeanMap.get(movieId) + userOffsetMap.get(userId);
   }
   
@@ -168,11 +177,11 @@ public class SingularValueDecompositionPredictor implements Predictor {
   
   private enum ParameterSVD {
     INSTANCE;
-    private final int cycles = 50; //Set Default to 100
+    private final int cycles = 120; //Set Default to 100
     private final Double learningRate = 0.001;
-    private final int featureLimit = 20; //Set Default to 30
+    private final int featureLimit = 30; //Set Default to 30
     private final Double regularizationTerm = 0.02;
-    private final int meanMultiplier = 15; //Eventually set to 25
+    private final int meanMultiplier = 10; //Seems to work well
   }
 
 }
