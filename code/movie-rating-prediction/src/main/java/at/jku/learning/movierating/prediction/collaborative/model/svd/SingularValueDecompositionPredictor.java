@@ -1,6 +1,5 @@
 package at.jku.learning.movierating.prediction.collaborative.model.svd;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +14,6 @@ import at.jku.learning.movierating.prediction.Predictor;
 /**
  * Singular Value Decomposition implementation based on Simon Funks Netflix-approach 
  * and the FunkSVD implementation of the LensKit project. 
- * 
  */
 
 public class SingularValueDecompositionPredictor implements Predictor {
@@ -61,7 +59,6 @@ public class SingularValueDecompositionPredictor implements Predictor {
 
   @Override
   public Double predictRating(Long userId, Long movieId) {
-    // TODO P = mean + userOffset + itemOffset + user_features * item_features
     Double prediction;
     Double sum = 0.0;
     //Calculate the dot product of user and item features
@@ -70,8 +67,6 @@ public class SingularValueDecompositionPredictor implements Predictor {
     }
     //Add mean + userOffset + itemOffset
     prediction = getBaseline(movieId, userId) + sum;
-    
-    //System.out.println(prediction);
     
     return prediction;
   }
@@ -86,7 +81,6 @@ public class SingularValueDecompositionPredictor implements Predictor {
     FeatureSVD feature;
     featureSet = new HashSet<FeatureSVD>();
     computePreTrain();
-    Collections.shuffle(trainingSet);
     
     for (int featureRank=1; featureRank <= this.featureLimit; ++featureRank) {
       feature = new FeatureSVD(featureRank); //Create new Feature
@@ -111,12 +105,9 @@ public class SingularValueDecompositionPredictor implements Predictor {
               - regularizationTerm*feature.getItemFeature(rating.getMovieId()));
           
           feature.setUserFeature(rating.getUserId(), userFeature);
-          feature.setItemFeature(rating.getMovieId(), itemFeature);
-          
+          feature.setItemFeature(rating.getMovieId(), itemFeature);      
         }
       }
-      
-      //System.out.println(feature.toString());
     }
   }
   
@@ -168,10 +159,6 @@ public class SingularValueDecompositionPredictor implements Predictor {
       userOffset = globalMovieRatingMean - flattenedMean;
       userOffsetMap.put(userId, userOffset);
     }
-
-    
-    
-    System.out.println("Pre-training done." + movieMeanMap.size() + " " + userOffsetMap.size());
     
   }
   
