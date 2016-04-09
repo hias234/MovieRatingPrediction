@@ -55,10 +55,11 @@ public class ConfigTester {
 					if (out != null) {
 						out.print("ConfigTester: " + doneTasks + "/" + predictors.length);
 						if (ex != null) {
-							out.print(" - failed: " + ex);
+							out.println(" - failed:");
 							ex.printStackTrace(out);
+						} else {
+							out.println();
 						}
-						out.println();
 					}
 					// null in case of exception
 					return data;
@@ -76,7 +77,7 @@ public class ConfigTester {
 			} catch (InterruptedException | ExecutionException e) {
 				singleResult = null;
 				if (out != null) {
-					out.println("getting task result failed: " + e);
+					out.println("getting task result failed:");
 					e.printStackTrace(out);
 				}
 			}

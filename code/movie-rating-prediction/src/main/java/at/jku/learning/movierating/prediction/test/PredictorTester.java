@@ -43,17 +43,34 @@ public class PredictorTester {
 		
 		Integer innerSum = 0;
 		int i = 0;
+		int failed = 0;
 		for (Rating rating : testSet) {
-			Integer predictedRating = predictor.predictRating(rating.getUserId(), rating.getMovieId());
-			innerSum += (predictedRating - rating.getRating()) * (predictedRating - rating.getRating());
+			Exception ex = null;
+			try {
+				Integer predictedRating = predictor.predictRating(rating.getUserId(), rating.getMovieId());
+				innerSum += (predictedRating - rating.getRating()) * (predictedRating - rating.getRating());
+			} catch (Exception e) {
+				ex = e;
+				failed++;
+			}
 			
 			if (out != null) {
 //				out.println(predictor + " " + (i++) + "  Real Rating: " + rating.getRating() + ", predicted: " + predictedRating);
-				out.println("PredictorTester: " + predictor + ": " + (++i) + "/" + testSet.size());
+				out.print("PredictorTester: " + predictor + ": " + (++i) + "/" + testSet.size());
+				if (ex != null) {
+					out.println(" - failed:");
+					ex.printStackTrace(out);
+				} else {
+					out.println();
+				}
 			}
 		}
 		
-		return Math.sqrt(1.0 / testSet.size() * innerSum);
+		if (failed > 0 && out != null) {
+			out.println("PredictorTester: " + predictor + ": failed " + failed + " out of " + testSet.size());
+		}
+		
+		return Math.sqrt(1.0 / (testSet.size() - failed) * innerSum);
 	}
 	
 	public List<Map.Entry<PrecisePredictor, Double>> comparePredictors(PrecisePredictor... predictors) {
