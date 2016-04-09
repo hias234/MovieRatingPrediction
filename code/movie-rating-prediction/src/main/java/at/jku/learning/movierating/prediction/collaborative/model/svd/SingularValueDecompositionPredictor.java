@@ -14,7 +14,6 @@ import at.jku.learning.movierating.prediction.Predictor;
 /**
  * Singular Value Decomposition implementation based on Simon Funks Netflix-approach 
  * and the FunkSVD implementation of the LensKit project. 
- * 
  */
 
 public class SingularValueDecompositionPredictor implements Predictor {
@@ -25,6 +24,7 @@ public class SingularValueDecompositionPredictor implements Predictor {
   private Map<Long, Double> userOffsetMap;
   private final int cycles;
   private final int featureLimit;
+  private final int meanMultiplier;
   private final Double learningRate;
   private final Double regularizationTerm;
 
@@ -34,6 +34,7 @@ public class SingularValueDecompositionPredictor implements Predictor {
     this.learningRate = ParameterSVD.INSTANCE.learningRate;
     this.featureLimit = ParameterSVD.INSTANCE.featureLimit;
     this.regularizationTerm = ParameterSVD.INSTANCE.regularizationTerm;
+    this.meanMultiplier = ParameterSVD.INSTANCE.meanMultiplier;
   }
   
   public SingularValueDecompositionPredictor(int cycles) {
@@ -41,18 +42,23 @@ public class SingularValueDecompositionPredictor implements Predictor {
     this.learningRate = ParameterSVD.INSTANCE.learningRate;
     this.featureLimit = ParameterSVD.INSTANCE.featureLimit;
     this.regularizationTerm = ParameterSVD.INSTANCE.regularizationTerm;
+    this.meanMultiplier = ParameterSVD.INSTANCE.meanMultiplier;
   } 
   
-  public SingularValueDecompositionPredictor(int cycles, Double learningRate, int featureLimit) {
+  public SingularValueDecompositionPredictor(int cycles, 
+                                             Double learningRate, 
+                                             int featureLimit, 
+                                             int meanMultiplier) {
     this.cycles = cycles;
     this.learningRate = learningRate;
     this.featureLimit = featureLimit;
+    this.meanMultiplier = meanMultiplier;
     this.regularizationTerm = ParameterSVD.INSTANCE.regularizationTerm;
+     
   }
 
   @Override
   public Double predictRating(Long userId, Long movieId) {
-    // TODO P = mean + userOffset + itemOffset + user_features * item_features
     Double prediction;
     Double sum = 0.0;
     //Calculate the dot product of user and item features
@@ -61,8 +67,6 @@ public class SingularValueDecompositionPredictor implements Predictor {
     }
     //Add mean + userOffset + itemOffset
     prediction = getBaseline(movieId, userId) + sum;
-    
-    //System.out.println(prediction);
     
     return prediction;
   }
@@ -101,16 +105,14 @@ public class SingularValueDecompositionPredictor implements Predictor {
               - regularizationTerm*feature.getItemFeature(rating.getMovieId()));
           
           feature.setUserFeature(rating.getUserId(), userFeature);
-          feature.setItemFeature(rating.getMovieId(), itemFeature);
-          
+          feature.setItemFeature(rating.getMovieId(), itemFeature);      
         }
       }
-      
-      //System.out.println(feature.toString());
     }
   }
   
   private Double getBaseline(Long movieId, Long userId) {
+    //What if movie does not exist
     return movieMeanMap.get(movieId) + userOffsetMap.get(userId);
   }
   
@@ -157,10 +159,6 @@ public class SingularValueDecompositionPredictor implements Predictor {
       userOffset = globalMovieRatingMean - flattenedMean;
       userOffsetMap.put(userId, userOffset);
     }
-
-    
-    
-    System.out.println("Pre-training done." + movieMeanMap.size() + " " + userOffsetMap.size());
     
   }
   
@@ -171,11 +169,11 @@ public class SingularValueDecompositionPredictor implements Predictor {
   
   private enum ParameterSVD {
     INSTANCE;
-    private final int cycles = 50; //Set Default to 100
+    private final int cycles = 120; //Set Default to 100
     private final Double learningRate = 0.001;
-    private final int featureLimit = 20; //Set Default to 30
+    private final int featureLimit = 30; //Set Default to 30
     private final Double regularizationTerm = 0.02;
-    private final int meanMultiplier = 15; //Eventually set to 25
+    private final int meanMultiplier = 10; //Seems to work well
   }
 
 }
