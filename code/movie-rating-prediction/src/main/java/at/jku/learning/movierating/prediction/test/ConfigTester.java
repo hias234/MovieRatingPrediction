@@ -53,7 +53,12 @@ public class ConfigTester {
 					}
 					doneTasks.incrementAndGet();
 					if (out != null) {
-						out.println("ConfigTester: " + doneTasks + "/" + predictors.length + (data == null ? " - failed: " + ex : ""));
+						out.print("ConfigTester: " + doneTasks + "/" + predictors.length);
+						if (ex != null) {
+							out.print(" - failed: " + ex);
+							ex.printStackTrace(out);
+						}
+						out.println();
 					}
 					// null in case of exception
 					return data;
@@ -70,6 +75,10 @@ public class ConfigTester {
 				singleResult = task.get();
 			} catch (InterruptedException | ExecutionException e) {
 				singleResult = null;
+				if (out != null) {
+					out.println("getting task result failed: " + e);
+					e.printStackTrace(out);
+				}
 			}
 			// only add the result if it completed successfully (that is, the call "task.get()"
 			// itself succeeded as well the executed code ---> see comment above)
