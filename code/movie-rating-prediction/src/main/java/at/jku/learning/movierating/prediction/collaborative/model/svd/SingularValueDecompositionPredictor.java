@@ -27,6 +27,7 @@ public class SingularValueDecompositionPredictor implements Predictor {
   private final int meanMultiplier;
   private final Double learningRate;
   private final Double regularizationTerm;
+  private Double globalMovieRatingMean = 0.0;
 
   
   public SingularValueDecompositionPredictor(){
@@ -112,8 +113,10 @@ public class SingularValueDecompositionPredictor implements Predictor {
   }
   
   private Double getBaseline(Long movieId, Long userId) {
-    //What if movie does not exist
-    return movieMeanMap.get(movieId) + userOffsetMap.get(userId);
+    globalMovieRatingMean = this.trainingSet.stream().mapToInt(r -> r.getRating()).average().getAsDouble();
+
+    return (movieMeanMap.containsKey(movieId) ? movieMeanMap.get(movieId) : globalMovieRatingMean)
+           + (userOffsetMap.containsKey(userId) ? userOffsetMap.get(userId) : 0.0);
   }
   
   private void computePreTrain() {
@@ -130,14 +133,14 @@ public class SingularValueDecompositionPredictor implements Predictor {
     Long sumUser = 0L;
     Long countMovie = 0L;
     Long countUser = 0L;
-    Double globalMovieRatingMean = 0.0;
+    //Double globalMovieRatingMean = 0.0;
     Double flattenedMean = 0.0;
     Double userOffset = 0.0;
     int k = ParameterSVD.INSTANCE.meanMultiplier;
     
     //Flattened mean of movies
     trainingSetByMovieId = this.trainingSet.stream().collect(Collectors.groupingBy(i -> i.getMovieId()));
-    globalMovieRatingMean = this.trainingSet.stream().mapToInt(r -> r.getRating()).average().getAsDouble();
+    //globalMovieRatingMean = this.trainingSet.stream().mapToInt(r -> r.getRating()).average().getAsDouble();
     
     for (Map.Entry<Long, List<Rating>> movieRatings : trainingSetByMovieId.entrySet()) {
       movieId = movieRatings.getKey();
@@ -164,9 +167,9 @@ public class SingularValueDecompositionPredictor implements Predictor {
   
   private enum ParameterSVD {
     INSTANCE;
-    private final int cycles = 120; //Set Default to 100
+    private final int cycles = 120; 
     private final Double learningRate = 0.001;
-    private final int featureLimit = 30; //Set Default to 30
+    private final int featureLimit = 30; 
     private final Double regularizationTerm = 0.02;
     private final int meanMultiplier = 10; //Seems to work well
   }
