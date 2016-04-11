@@ -113,8 +113,6 @@ public class SingularValueDecompositionPredictor implements Predictor {
   }
   
   private Double getBaseline(Long movieId, Long userId) {
-    globalMovieRatingMean = this.trainingSet.stream().mapToInt(r -> r.getRating()).average().getAsDouble();
-
     return (movieMeanMap.containsKey(movieId) ? movieMeanMap.get(movieId) : globalMovieRatingMean)
            + (userOffsetMap.containsKey(userId) ? userOffsetMap.get(userId) : 0.0);
   }
@@ -140,7 +138,7 @@ public class SingularValueDecompositionPredictor implements Predictor {
     
     //Flattened mean of movies
     trainingSetByMovieId = this.trainingSet.stream().collect(Collectors.groupingBy(i -> i.getMovieId()));
-    //globalMovieRatingMean = this.trainingSet.stream().mapToInt(r -> r.getRating()).average().getAsDouble();
+    globalMovieRatingMean = this.trainingSet.stream().mapToInt(r -> r.getRating()).average().getAsDouble();
     
     for (Map.Entry<Long, List<Rating>> movieRatings : trainingSetByMovieId.entrySet()) {
       movieId = movieRatings.getKey();
