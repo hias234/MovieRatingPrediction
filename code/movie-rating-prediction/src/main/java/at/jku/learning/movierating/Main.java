@@ -12,6 +12,7 @@ import at.jku.learning.movierating.plot.GnuPlot;
 import at.jku.learning.movierating.prediction.CombinedMeanPredictor;
 import at.jku.learning.movierating.prediction.MathRoundPrecisePredictor;
 import at.jku.learning.movierating.prediction.PrecisePredictor;
+import at.jku.learning.movierating.prediction.baseline.UserAveragePredictor;
 import at.jku.learning.movierating.prediction.collaborative.memory.itembased.ItemBasedPredictor;
 import at.jku.learning.movierating.prediction.collaborative.memory.userbased.UserBasedPredictor;
 import at.jku.learning.movierating.prediction.collaborative.model.svd.SingularValueDecompositionPredictor;
@@ -51,7 +52,9 @@ public class Main {
 			
 			new MathRoundPrecisePredictor(new ItemBasedPredictor(50)),
 			new MathRoundPrecisePredictor(new UserBasedPredictor(50)),
-			new MathRoundPrecisePredictor(new CombinedMeanPredictor(Arrays.asList(new ItemBasedPredictor(50), new UserBasedPredictor(50))))
+			new MathRoundPrecisePredictor(new CombinedMeanPredictor(Arrays.asList(new ItemBasedPredictor(50), new UserBasedPredictor(50)))),
+			
+			new MathRoundPrecisePredictor(new UserAveragePredictor())
 	};
 
 	public static void main(String[] args) throws IOException {
@@ -70,6 +73,7 @@ public class Main {
 			PredictorTester pTester = new PredictorTester(trainingData, percentagesTrainingData[i], rnd);
 			ConfigTester cTester = new ConfigTester(out);
 			List<Entry<PrecisePredictor, Double>> result = cTester.testConfigs(pTester, CONFIGS);
+			out.println(result.get(0).getKey() + " " + result.get(0).getValue());
 			GnuPlot.writeGnuPlot(result, "config" + percentagesTrainingData[i], String.format("RMSE for different configurations with training size %2.3f%%", 100 * percentagesTrainingData[i]));
 			out.println("Main: " + (i + 1) + "/" + percentagesTrainingData.length);
 		}
