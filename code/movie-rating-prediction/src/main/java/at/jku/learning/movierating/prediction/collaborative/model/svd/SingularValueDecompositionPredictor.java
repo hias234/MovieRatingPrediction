@@ -167,7 +167,7 @@ public class SingularValueDecompositionPredictor implements Predictor {
     INSTANCE;
     private final int cycles = 120; 
     private final Double learningRate = 0.001;
-    private final int featureLimit = 30; 
+    private final int featureLimit = 40; 
     private final Double regularizationTerm = 0.02;
     private final int meanMultiplier = 10; //Seems to work well
   }
