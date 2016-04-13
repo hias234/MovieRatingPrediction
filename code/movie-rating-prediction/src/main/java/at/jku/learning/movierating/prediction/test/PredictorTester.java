@@ -1,5 +1,6 @@
 package at.jku.learning.movierating.prediction.test;
 
+import java.io.PrintStream;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,17 +18,24 @@ public class PredictorTester {
 	
 	private List<Rating> trainingSet;
 	private List<Rating> testSet;
+
+	private final PrintStream out;
 	
 	public PredictorTester(List<Rating> ratings, Double percentageTrainingData, Random rnd) {
+		this(ratings, percentageTrainingData, rnd, null);
+	}
+	
+	public PredictorTester(List<Rating> ratings, Double percentageTrainingData, Random rnd, PrintStream out) {
 		super();
 		this.ratings = ratings;
+		this.out = out;
 		Collections.shuffle(this.ratings, rnd);
 		
 		assert percentageTrainingData > 0.0 && percentageTrainingData < 1.0;
 		
 		Integer trainingSetCount = Double.valueOf(ratings.size() * percentageTrainingData).intValue();
-		this.trainingSet = ratings.subList(0, trainingSetCount);
-		this.testSet = ratings.subList(trainingSetCount + 1, ratings.size() - 1);
+		this.trainingSet = Collections.unmodifiableList(ratings.subList(0, trainingSetCount));
+		this.testSet = Collections.unmodifiableList(ratings.subList(trainingSetCount + 1, ratings.size() - 1));
 	}
 	
 	public Double calculateRSME(PrecisePredictor predictor) {
@@ -35,14 +43,34 @@ public class PredictorTester {
 		
 		Integer innerSum = 0;
 		int i = 0;
+		int failed = 0;
 		for (Rating rating : testSet) {
-			Integer predictedRating = predictor.predictRating(rating.getUserId(), rating.getMovieId());
-			innerSum += (predictedRating - rating.getRating()) * (predictedRating - rating.getRating());
+			Exception ex = null;
+			try {
+				Integer predictedRating = predictor.predictRating(rating.getUserId(), rating.getMovieId());
+				innerSum += (predictedRating - rating.getRating()) * (predictedRating - rating.getRating());
+			} catch (Exception e) {
+				ex = e;
+				failed++;
+			}
 			
-			System.out.println((i++) + "  Real Rating: " + rating.getRating() + ", predicted: " + predictedRating);
+			if (out != null) {
+//				out.println(predictor + " " + (i++) + "  Real Rating: " + rating.getRating() + ", predicted: " + predictedRating);
+				out.print("PredictorTester: " + predictor + ": " + (++i) + "/" + testSet.size());
+				if (ex != null) {
+					out.println(" - failed:");
+					ex.printStackTrace(out);
+				} else {
+					out.println();
+				}
+			}
 		}
 		
-		return Math.sqrt(1.0 / testSet.size() * innerSum);
+		if (failed > 0 && out != null) {
+			out.println("PredictorTester: " + predictor + ": failed " + failed + " out of " + testSet.size());
+		}
+		
+		return Math.sqrt(1.0 / (testSet.size() - failed) * innerSum);
 	}
 	
 	public List<Map.Entry<PrecisePredictor, Double>> comparePredictors(PrecisePredictor... predictors) {

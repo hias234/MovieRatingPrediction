@@ -32,4 +32,9 @@ public class MathRoundPrecisePredictor implements PrecisePredictor {
 	public void setPredictor(Predictor predictor) {
 		this.predictor = predictor;
 	}
+	
+	@Override
+	public String toString() {
+		return "MathRound " + predictor.toString();
+	}
 }

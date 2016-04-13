@@ -163,6 +163,11 @@ public class SingularValueDecompositionPredictor implements Predictor {
     
   }
   
+  @Override
+	public String toString() {
+		return "SVD cycles=" + cycles;
+	}
+  
   private enum ParameterSVD {
     INSTANCE;
     private final int cycles = 120; 

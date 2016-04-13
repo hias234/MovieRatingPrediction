@@ -144,4 +144,8 @@ public class ItemBasedPredictor implements Predictor {
 		return userBase;
 	}
 
+	@Override
+	public String toString() {
+		return "ItemBasedPredictor k=" + highestSimilarityItemOffset;
+	}
 }

@@ -138,4 +138,8 @@ public class UserBasedPredictor implements Predictor {
 		this.trainingSet = trainingSet;
 	}
 	
+	@Override
+	public String toString() {
+		return "UserBasedPredictor k=" + k;
+	}
 }
