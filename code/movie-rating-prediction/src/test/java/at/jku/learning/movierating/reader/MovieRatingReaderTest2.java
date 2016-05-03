@@ -33,6 +33,14 @@ public class MovieRatingReaderTest2 {
 			assertEquals(movie1.getTitle(), "Toy Story");
 			assertEquals(movie1.getYear().intValue(), 1995);
 			assertTrue(movie1.getGenres().contains("Animation"));
+			
+			Movie movie5 = movies.get(4);
+			System.out.println(movie5);
+			assertEquals(movie5.getId().longValue(), 1001L);
+			assertEquals(movie5.getTitle(), "The Associate");
+			assertEquals(movie5.getTitle2(), "L'Associe");
+			assertEquals(movie5.getYear().intValue(), 1982);
+			assertTrue(movie5.getGenres().contains("Comedy"));
 		}
 	}
 	

@@ -1,12 +1,19 @@
 package at.jku.learning.movierating;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.apache.commons.io.FileUtils;
+
+import at.jku.learning.movierating.crawler.MovieCrawler;
+import at.jku.learning.movierating.model.Movie;
 import at.jku.learning.movierating.model.Rating;
 import at.jku.learning.movierating.plot.GnuPlot;
 import at.jku.learning.movierating.prediction.CombinedMeanPredictor;
@@ -19,6 +26,8 @@ import at.jku.learning.movierating.prediction.collaborative.model.svd.SingularVa
 import at.jku.learning.movierating.prediction.test.ConfigTester;
 import at.jku.learning.movierating.prediction.test.PredictorTester;
 import at.jku.learning.movierating.reader.MovieRatingReader;
+import at.jku.learning.movierating.reader.MovieRatingReader2;
+import at.jku.learning.movierating.writer.MovieWriter;
 
 public class Main {
 	
@@ -58,27 +67,48 @@ public class Main {
 	};
 
 	public static void main(String[] args) throws IOException {
-		MovieRatingReader reader = new MovieRatingReader();
-		List<Rating> trainingData = reader.readRatings(Main.class.getResourceAsStream("/training.dat"));
-		// change if output is to be stored e.g. in a file
-		PrintStream out = System.out;
+		MovieRatingReader2 reader = new MovieRatingReader2();
+		List<Movie> movies = reader.readMovies(Main.class.getResourceAsStream("/movies.dat"));
+		System.out.println(movies.size());
 		
-		// create several plots for different percentage sizes of training data
-		double[] percentagesTrainingData = { 0.99999, 0.99995 };
-		
-		out.println("Main: total rounds = " + percentagesTrainingData.length);
-		long startTime = System.currentTimeMillis();
-		for (int i = 0; i < percentagesTrainingData.length; i++) {
-			Random rnd = new Random(System.currentTimeMillis());
-			PredictorTester pTester = new PredictorTester(trainingData, percentagesTrainingData[i], rnd);
-			ConfigTester cTester = new ConfigTester(out);
-			List<Entry<PrecisePredictor, Double>> result = cTester.testConfigs(pTester, CONFIGS);
-			out.println(result.get(0).getKey() + " " + result.get(0).getValue());
-			GnuPlot.writeGnuPlot(result, "config" + percentagesTrainingData[i], String.format("RMSE for different configurations with training size %2.3f%%", 100 * percentagesTrainingData[i]));
-			out.println("Main: " + (i + 1) + "/" + percentagesTrainingData.length);
+		List<Movie> outMovies = new ArrayList<>();
+		MovieCrawler crawler = new MovieCrawler();
+		for (int i = 0 ; i < movies.size(); i++) {
+			outMovies.add(crawler.gatherMoreInformationFromImdb(movies.get(i)));
 		}
-		long duration = System.currentTimeMillis() - startTime;
-		out.println("Main: completed in " + duration + " ms");
+		
+		MovieWriter writer = new MovieWriter();
+		File file = new File("C:\\Temp\\movies_imdb.dat");
+		
+		writer.writeMovies(outMovies, new FileOutputStream(file));
+
+		System.out.println();
+		System.out.println();
+		for (Movie notFound : crawler.getNotFoundMovies()) {
+			System.out.println(notFound);
+		}
+		
+//		MovieRatingReader reader = new MovieRatingReader();
+//		List<Rating> trainingData = reader.readRatings(Main.class.getResourceAsStream("/training.dat"));
+//		// change if output is to be stored e.g. in a file
+//		PrintStream out = System.out;
+//		
+//		// create several plots for different percentage sizes of training data
+//		double[] percentagesTrainingData = { 0.99999, 0.99995 };
+//		
+//		out.println("Main: total rounds = " + percentagesTrainingData.length);
+//		long startTime = System.currentTimeMillis();
+//		for (int i = 0; i < percentagesTrainingData.length; i++) {
+//			Random rnd = new Random(System.currentTimeMillis());
+//			PredictorTester pTester = new PredictorTester(trainingData, percentagesTrainingData[i], rnd);
+//			ConfigTester cTester = new ConfigTester(out);
+//			List<Entry<PrecisePredictor, Double>> result = cTester.testConfigs(pTester, CONFIGS);
+//			out.println(result.get(0).getKey() + " " + result.get(0).getValue());
+//			GnuPlot.writeGnuPlot(result, "config" + percentagesTrainingData[i], String.format("RMSE for different configurations with training size %2.3f%%", 100 * percentagesTrainingData[i]));
+//			out.println("Main: " + (i + 1) + "/" + percentagesTrainingData.length);
+//		}
+//		long duration = System.currentTimeMillis() - startTime;
+//		out.println("Main: completed in " + duration + " ms");
 	}
 	
 }

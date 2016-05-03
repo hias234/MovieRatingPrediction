@@ -36,7 +36,15 @@ public class MovieRatingReader2 {
 		movie.setId(Long.valueOf(lineParts[0]));
 		
 		String titleAndYear = lineParts[1];
-		movie.setTitle(titleAndYear.substring(0, titleAndYear.length() - 7));
+		String fullTitle = titleAndYear.substring(0, titleAndYear.length() - 6).trim();
+		int indexParanthesis = fullTitle.indexOf('(');
+		if (indexParanthesis == -1) {
+			movie.setTitle(processTitle(fullTitle));
+		}
+		else {
+			movie.setTitle(processTitle(fullTitle.substring(0, indexParanthesis - 1).trim()));
+			movie.setTitle2(processTitle(fullTitle.substring(indexParanthesis).replaceAll("\\(|\\)", "").trim()));
+		}
 		movie.setYear(Integer.valueOf(titleAndYear.substring(titleAndYear.length() - 5, titleAndYear.length() - 1)));
 		
 		movie.setGenres(Arrays.asList(lineParts[2].split("\\|")));
@@ -44,4 +52,13 @@ public class MovieRatingReader2 {
 		return movie;
 	}
 	
+	private String processTitle(String title) {
+		if (title.endsWith(", The")) {
+			return "The " + title.substring(0, title.length() - 5).trim();
+		}
+		if (title.endsWith(", A")) {
+			return "A " + title.substring(0, title.length() - 3).trim();
+		}
+		return title.trim();
+	}
 }

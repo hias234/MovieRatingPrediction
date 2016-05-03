@@ -6,8 +6,16 @@ public class Movie {
 
 	private Long id;
 	private String title;
+	private String title2;
 	private Integer year;
 	private List<String> genres;
+
+	// IMDB
+	private String imdbText;
+	private String shortDescription;
+	private String storyLine;
+	private List<String> actors;
+	private List<String> directors;
 
 	public Long getId() {
 		return id;
@@ -23,6 +31,14 @@ public class Movie {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public String getTitle2() {
+		return title2;
+	}
+
+	public void setTitle2(String title2) {
+		this.title2 = title2;
 	}
 
 	public Integer getYear() {
@@ -41,10 +57,50 @@ public class Movie {
 		this.genres = genres;
 	}
 
-	@Override
-	public String toString() {
-		return "Movie [id=" + id + ", title=" + title + ", year=" + year + ", genres=" + genres + "]";
+	public String getImdbText() {
+		return imdbText;
 	}
 
-	
+	public void setImdbText(String imdbText) {
+		this.imdbText = imdbText;
+	}
+
+	public String getShortDescription() {
+		return shortDescription;
+	}
+
+	public void setShortDescription(String shortDescription) {
+		this.shortDescription = shortDescription;
+	}
+
+	public String getStoryLine() {
+		return storyLine;
+	}
+
+	public void setStoryLine(String storyLine) {
+		this.storyLine = storyLine;
+	}
+
+	public List<String> getActors() {
+		return actors;
+	}
+
+	public void setActors(List<String> actors) {
+		this.actors = actors;
+	}
+
+	public List<String> getDirectors() {
+		return directors;
+	}
+
+	public void setDirectors(List<String> directors) {
+		this.directors = directors;
+	}
+
+	@Override
+	public String toString() {
+		return "Movie [id=" + id + ", title=" + title + ", title2=" + title2 + ", year=" + year + ", genres=" + genres
+				+ "]";
+	}
+
 }
