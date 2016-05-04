@@ -75,11 +75,32 @@ public class MovieReader {
 		if (title.endsWith(", A")) {
 			return "A " + title.substring(0, title.length() - 3).trim();
 		}
+		if (title.endsWith(", An")) {
+			return "An " + title.substring(0, title.length() - 4).trim();
+		}
 		if (title.endsWith(", L'")) {
 			return "L'" + title.substring(0, title.length() - 4).trim();
 		}
 		if (title.endsWith(", Les")) {
 			return "Les " + title.substring(0, title.length() - 5).trim();
+		}
+		if (title.endsWith(", La")) {
+			return "La " + title.substring(0, title.length() - 4).trim();
+		}
+		if (title.endsWith(", Le")) {
+			return "Le " + title.substring(0, title.length() - 4).trim();
+		}
+		if (title.endsWith(", El")) {
+			return "El " + title.substring(0, title.length() - 4).trim();
+		}
+		if (title.endsWith(", Der")) {
+			return "Der " + title.substring(0, title.length() - 5).trim();
+		}
+		if (title.endsWith(", Die")) {
+			return "Die " + title.substring(0, title.length() - 5).trim();
+		}
+		if (title.endsWith(", Das")) {
+			return "Das " + title.substring(0, title.length() - 5).trim();
 		}
 		
 		return title.trim();
