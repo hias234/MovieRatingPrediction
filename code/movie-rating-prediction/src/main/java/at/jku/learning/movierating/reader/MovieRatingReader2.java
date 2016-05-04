@@ -59,6 +59,13 @@ public class MovieRatingReader2 {
 		if (title.endsWith(", A")) {
 			return "A " + title.substring(0, title.length() - 3).trim();
 		}
+		if (title.endsWith(", L'")) {
+			return "L'" + title.substring(0, title.length() - 4).trim();
+		}
+		if (title.endsWith(", Les")) {
+			return "Les " + title.substring(0, title.length() - 5).trim();
+		}
+		
 		return title.trim();
 	}
 }

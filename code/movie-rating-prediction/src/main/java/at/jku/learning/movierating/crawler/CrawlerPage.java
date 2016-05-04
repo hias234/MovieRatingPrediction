@@ -36,7 +36,7 @@ public class CrawlerPage {
 	public String getCacheName() {
 		if (this.cacheName == null) {
 			this.cacheName = CrawlerUtil.getCachePath(
-					".movie_rating", "page_" + this.url.toString().replaceAll("[ \\/\\.\\(\\):&=?]", "_") + ".html");
+					".movie_rating", "page_" + this.url.toString().replaceAll("[ \\/\\.\\(\\):&=?*]", "_") + ".html");
 		}
 		return this.cacheName;
 	}

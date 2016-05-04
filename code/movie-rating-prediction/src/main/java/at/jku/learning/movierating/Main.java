@@ -74,7 +74,12 @@ public class Main {
 		List<Movie> outMovies = new ArrayList<>();
 		MovieCrawler crawler = new MovieCrawler();
 		for (int i = 0 ; i < movies.size(); i++) {
-			outMovies.add(crawler.gatherMoreInformationFromImdb(movies.get(i)));
+			try {
+				outMovies.add(crawler.gatherMoreInformationFromImdb(movies.get(i)));
+			}
+			catch(IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 		
 		MovieWriter writer = new MovieWriter();

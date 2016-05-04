@@ -32,14 +32,18 @@ public class MovieWriter {
 		}
 		pw.write(" (" + movie.getYear() + ")");
 		pw.write("\t");
-		
+
 		writeList(movie.getGenres(), pw, "|");
 		pw.write("\t");
-		
-		pw.write(movie.getImdbText().replaceAll("\t", ""));
+
+		if (movie.getImdbText() != null) {
+			pw.write(movie.getImdbText().replaceAll("\t", ""));
+		}
 		pw.write("\t");
 
-		pw.write(movie.getShortDescription().replaceAll("\t", ""));
+		if (movie.getShortDescription() != null) {
+			pw.write(movie.getShortDescription().replaceAll("\t", ""));
+		}
 		pw.write("\t");
 
 		if (movie.getStoryLine() != null) {
@@ -49,16 +53,18 @@ public class MovieWriter {
 
 		writeList(movie.getActors(), pw, "|");
 		pw.write("\t");
-		
+
 		writeList(movie.getDirectors(), pw, "|");
 	}
-	
+
 	private void writeList(List<String> list, PrintWriter pw, String separator) {
-		for (int i = 0; i < list.size(); i++) {
-			if (i > 0) {
-				pw.write(separator);
+		if (list != null) {
+			for (int i = 0; i < list.size(); i++) {
+				if (i > 0) {
+					pw.write(separator);
+				}
+				pw.write(list.get(i));
 			}
-			pw.write(list.get(i));
 		}
 	}
 }

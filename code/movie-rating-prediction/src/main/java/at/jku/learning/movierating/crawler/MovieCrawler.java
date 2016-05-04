@@ -1,6 +1,8 @@
 package at.jku.learning.movierating.crawler;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -28,7 +30,28 @@ public class MovieCrawler {
 		System.out.println("------------------------------");
 		System.out.println("INFO FOR " + searchString);
 
-		Document searchPage = getDocument(IMDB_SEARCH_URL.replace("###SEARCH_TITLE###", searchString));
+		Document searchPage = getDocument(IMDB_SEARCH_URL.replace("###SEARCH_TITLE###", URLEncoder.encode(searchString, "UTF-8")));
+		Element bestFitLink = findBestFitLinkOfSearchPage(movie, searchPage);
+		
+		if (bestFitLink == null) {
+			searchPage = getDocument(IMDB_SEARCH_URL.replace("###SEARCH_TITLE###", URLEncoder.encode(movie.getTitle(), "UTF-8")));
+			bestFitLink = findBestFitLinkOfSearchPage(movie, searchPage);
+			
+			if (bestFitLink == null) {
+				notFoundMovies.add(movie);
+				return movie;
+			}
+		}
+		System.out.println("found title " + bestFitLink.text());
+		if (!bestFitLink.text().toLowerCase().contains(movie.getTitle().toLowerCase()) || !movie.getTitle().toLowerCase().contains(bestFitLink.text().toLowerCase())) {
+			System.out.println("WRONG TITLE: " + bestFitLink.text());
+		}
+		
+		String moviePageUrl = IMDB_BASE_URL + bestFitLink.attr("href");
+		return gatherMoreInformationFromImdbPage(movie, moviePageUrl);
+	}
+
+	private Element findBestFitLinkOfSearchPage(Movie movie, Document searchPage) {
 		Element bestFitLink = null;
 		for (Element item : searchPage.select(".findList .findResult .result_text")) {
 			Element link = item.select("a").first();
@@ -45,22 +68,9 @@ public class MovieCrawler {
 				}
 			}*/
 		}
-
-		if (bestFitLink != null) {
-			System.out.println("found title " + bestFitLink.text());
-			if (!bestFitLink.text().toLowerCase().contains(movie.getTitle().toLowerCase())) {
-				System.out.println("WRONG TITLE: " + bestFitLink.text() + "  -  " + movie.getTitle());
-			}
-
-			String moviePageUrl = IMDB_BASE_URL + bestFitLink.attr("href");
-			return gatherMoreInformationFromImdbPage(movie, moviePageUrl);
-		} else {
-			System.out.println("ERROR: NO RESULT FOUND");
-			notFoundMovies.add(movie);
-			return movie;
-		}
+		return bestFitLink;
 	}
-
+	
 	public List<Movie> getNotFoundMovies() {
 		return notFoundMovies;
 	}
@@ -72,12 +82,12 @@ public class MovieCrawler {
 		movie.setImdbText(imdbText);
 
 		String shortDescription = moviePage.select(".summary_text").text();
-		movie.setShortDescription(shortDescription);
+		movie.setShortDescription(shortDescription.trim());
 
 		Element storyLineElement = moviePage.select("#titleStoryLine p").first();
 		if (storyLineElement != null) {
 			String storyLine = storyLineElement.childNodes().get(0).outerHtml();
-			movie.setStoryLine(storyLine);
+			movie.setStoryLine(storyLine.trim());
 		}
 
 		List<String> actors = new ArrayList<>();
