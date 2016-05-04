@@ -39,15 +39,24 @@ public class MovieWriter {
 		if (movie.getImdbText() != null) {
 			pw.write(movie.getImdbText().replaceAll("\t", ""));
 		}
+		else {
+			pw.write(" ");
+		}
 		pw.write("\t");
 
 		if (movie.getShortDescription() != null) {
 			pw.write(movie.getShortDescription().replaceAll("\t", ""));
 		}
+		else {
+			pw.write(" ");
+		}
 		pw.write("\t");
 
 		if (movie.getStoryLine() != null) {
 			pw.write(movie.getStoryLine().replaceAll("\t", ""));
+		}
+		else {
+			pw.write(" ");
 		}
 		pw.write("\t");
 
@@ -65,6 +74,9 @@ public class MovieWriter {
 				}
 				pw.write(list.get(i));
 			}
+		}
+		else {
+			pw.write(" ");
 		}
 	}
 }

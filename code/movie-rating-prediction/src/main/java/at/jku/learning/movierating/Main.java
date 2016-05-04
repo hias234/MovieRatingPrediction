@@ -26,7 +26,7 @@ import at.jku.learning.movierating.prediction.collaborative.model.svd.SingularVa
 import at.jku.learning.movierating.prediction.test.ConfigTester;
 import at.jku.learning.movierating.prediction.test.PredictorTester;
 import at.jku.learning.movierating.reader.MovieRatingReader;
-import at.jku.learning.movierating.reader.MovieRatingReader2;
+import at.jku.learning.movierating.reader.MovieReader;
 import at.jku.learning.movierating.writer.MovieWriter;
 
 public class Main {
@@ -67,7 +67,7 @@ public class Main {
 	};
 
 	public static void main(String[] args) throws IOException {
-		MovieRatingReader2 reader = new MovieRatingReader2();
+		MovieReader reader = new MovieReader();
 		List<Movie> movies = reader.readMovies(Main.class.getResourceAsStream("/movies.dat"));
 		System.out.println(movies.size());
 		
