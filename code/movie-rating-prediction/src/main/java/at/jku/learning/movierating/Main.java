@@ -69,7 +69,6 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		MovieReader reader = new MovieReader();
 		List<Movie> movies = reader.readMovies(Main.class.getResourceAsStream("/movies.dat"));
-		System.out.println(movies.size());
 		
 		List<Movie> outMovies = new ArrayList<>();
 		MovieCrawler crawler = new MovieCrawler();

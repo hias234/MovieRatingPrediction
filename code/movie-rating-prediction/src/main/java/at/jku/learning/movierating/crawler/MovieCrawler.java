@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,14 +25,20 @@ public class MovieCrawler {
 	private Pattern yearPattern = Pattern.compile("(\\d\\d\\d\\d)");
 	
 	public Movie gatherMoreInformationFromImdb(Movie movie) throws IOException {
-		String searchString = movie.getTitle() + " (" + movie.getYear() + ")";
+		Integer[] searchYearDeltas = new Integer[]{0, -1, 1, -2, 2};
+		
+		Element bestFitLink = null;
+		Document searchPage;
+		
+		for (Integer searchYearDelta : Arrays.asList(searchYearDeltas)) {
+			String searchString = movie.getTitle() + " (" + (movie.getYear() + searchYearDelta) + ")";
 
-		System.out.println();
-		System.out.println("------------------------------");
-		System.out.println("INFO FOR " + searchString);
-
-		Document searchPage = getDocument(IMDB_SEARCH_URL.replace("###SEARCH_TITLE###", URLEncoder.encode(searchString, "UTF-8")));
-		Element bestFitLink = findBestFitLinkOfSearchPage(movie, searchPage);
+			searchPage = getDocument(IMDB_SEARCH_URL.replace("###SEARCH_TITLE###", URLEncoder.encode(searchString, "UTF-8")));
+			bestFitLink = findBestFitLinkOfSearchPage(movie, searchPage);
+			if (bestFitLink != null) {
+				break;
+			}
+		}
 		
 		if (bestFitLink == null) {
 			searchPage = getDocument(IMDB_SEARCH_URL.replace("###SEARCH_TITLE###", URLEncoder.encode(movie.getTitle(), "UTF-8")));
@@ -42,9 +49,8 @@ public class MovieCrawler {
 				return movie;
 			}
 		}
-		System.out.println("found title " + bestFitLink.text());
 		if (!bestFitLink.text().toLowerCase().contains(movie.getTitle().toLowerCase()) || !movie.getTitle().toLowerCase().contains(bestFitLink.text().toLowerCase())) {
-			System.out.println("WRONG TITLE: " + bestFitLink.text());
+			System.out.println("WRONG TITLE: " + movie.getTitle() + " (" + movie.getYear() + ")" + " - "  + bestFitLink.text());
 		}
 		
 		String moviePageUrl = IMDB_BASE_URL + bestFitLink.attr("href");
@@ -102,15 +108,26 @@ public class MovieCrawler {
 		}
 		movie.setDirectors(directors);
 
-		System.out.println(shortDescription);
-		System.out.println(movie.getStoryLine());
-		System.out.println(actors);
-		System.out.println(directors);
+		if (shortDescription == null || shortDescription.isEmpty())
+			System.out.println(movie.getTitle() + "  shortDescription=NULL");
+		if (storyLineElement == null)
+			System.out.println(movie.getTitle() + "  storyLine=NULL");
+		if (actors.isEmpty())
+			System.out.println(movie.getTitle() + "  actors=[]");
+		if (directors.isEmpty()) 
+			System.out.println(movie.getTitle() + "  directors=[]");
 
 		return movie;
 	}
 
 	private Document getDocument(String url) throws IOException {
 		return new CrawlerPage(url).getDocument();
+	}
+	
+	private static class ImdbSearchResult {
+		Element element;
+		String title;
+		Integer year;
+		
 	}
 }
