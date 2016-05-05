@@ -6,12 +6,49 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import at.jku.learning.movierating.model.Movie;
-import at.jku.learning.movierating.model.Rating;
 
 public class MovieReader {
+	
+	public Map<Long, List<String>> readMovieTokens(InputStream stream) throws IOException {
+		Map<Long, List<String>> movieTokens = new HashMap<>();
+		List<Movie> movies = new ArrayList<>();
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
+			movies = readMovies(reader);
+		}
+		movies.forEach(m -> {
+			List<String> titleTokens = Arrays.asList(removeSpecialChars(m.getTitle()).split(" ")).stream().filter(tkn -> !tkn.isEmpty()).collect(Collectors.toList());
+			List<String> genreTokens = m.getGenres();
+			List<String> shortDescTokens = Arrays.asList(removeSpecialChars(m.getShortDescription()).split(" ")).stream().filter(tkn -> !tkn.isEmpty()).collect(Collectors.toList());
+			List<String> storyLineTokens = Arrays.asList(removeSpecialChars(m.getStoryLine()).split(" ")).stream().filter(tkn -> !tkn.isEmpty()).collect(Collectors.toList());
+			List<String> actorTokens = m.getActors();
+			List<String> directorTokens = m.getDirectors();
+			
+			if (titleTokens != null && genreTokens != null && shortDescTokens != null && storyLineTokens != null && actorTokens != null && directorTokens != null) {
+				List<String> tokens = new ArrayList<>();
+				tokens.addAll(titleTokens);
+				tokens.addAll(genreTokens);
+				tokens.addAll(shortDescTokens);
+				tokens.addAll(storyLineTokens);
+				tokens.addAll(actorTokens);
+				tokens.addAll(directorTokens);
+				movieTokens.put(m.getId(), tokens);
+			} else {
+				System.err.println("Movie '" + m.getTitle() + "' was not tokenized!");
+			}
+		});
+		return movieTokens;
+	}
+	
+	private String removeSpecialChars(String s) {
+		String regex = "[^0-9a-zA-Z-_’'‘ÆÐƎƏƐƔĲŊŒẞÞǷȜæðǝəɛɣĳŋœĸſßþƿȝĄƁÇĐƊĘĦĮƘŁØƠŞȘŢȚŦŲƯY̨Ƴąɓçđɗęħįƙłøơşșţțŧųưy̨ƴÁÀÂÄǍĂĀÃÅǺĄÆǼǢƁĆĊĈČÇĎḌĐƊÐÉÈĖÊËĚĔĒĘẸƎƏƐĠĜǦĞĢƔáàâäǎăāãåǻąæǽǣɓćċĉčçďḍđɗðéèėêëěĕēęẹǝəɛġĝǧğģɣĤḤĦIÍÌİÎÏǏĬĪĨĮỊĲĴĶƘĹĻŁĽĿʼNŃN̈ŇÑŅŊÓÒÔÖǑŎŌÕŐỌØǾƠŒĥḥħıíìiîïǐĭīĩįịĳĵķƙĸĺļłľŀŉńn̈ňñņŋóòôöǒŏōõőọøǿơœŔŘŖŚŜŠŞȘṢẞŤŢṬŦÞÚÙÛÜǓŬŪŨŰŮŲỤƯẂẀŴẄǷÝỲŶŸȲỸƳŹŻŽẒŕřŗſśŝšşșṣßťţṭŧþúùûüǔŭūũűůųụưẃẁŵẅƿýỳŷÿȳỹƴźżžẓ]";
+		return s.replaceAll(regex, " ");
+	}
 
 	public List<Movie> readMovies(InputStream stream) throws IOException{
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(stream))) {
