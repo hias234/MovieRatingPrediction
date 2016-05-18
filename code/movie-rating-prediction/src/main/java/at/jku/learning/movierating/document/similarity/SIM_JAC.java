@@ -13,7 +13,7 @@ public class SIM_JAC implements Similarity {
 			double w_d2_t = doc2weight == null ? 0 : doc2weight;
 			sim += w_d1_t * w_d2_t;
 		}
-		return (2 * sim) / (doc1.size() * doc1.size() + doc2.size() * doc2.size() - sim);
+		return sim / (doc1.size() * doc1.size() + doc2.size() * doc2.size() - sim);
 	}
 	
 }
