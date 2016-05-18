@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import at.jku.learning.movierating.crawler.MovieCrawler;
+import at.jku.learning.movierating.crawler.ImdbMovieCrawler;
 import at.jku.learning.movierating.document.VectorSpaceModel;
 import at.jku.learning.movierating.document.idf.IDF;
 import at.jku.learning.movierating.document.idf.IDF_B;
@@ -84,10 +84,10 @@ public class Main {
 		List<Movie> movies = reader.readMovies(Main.class.getResourceAsStream("/movies.dat"));
 		
 		List<Movie> outMovies = new ArrayList<>();
-		MovieCrawler crawler = new MovieCrawler();
+		ImdbMovieCrawler crawler = new ImdbMovieCrawler();
 		for (int i = 0 ; i < movies.size(); i++) {
 			try {
-				outMovies.add(crawler.gatherMoreInformationFromImdb(movies.get(i)));
+				outMovies.add(crawler.gatherMoreInformation(movies.get(i)));
 			}
 			catch(IOException ex) {
 				ex.printStackTrace();
