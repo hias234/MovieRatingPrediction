@@ -17,7 +17,7 @@ public class ItemBasedPredictor implements Predictor {
 
 	private List<Rating> trainingSet;
 	private Map<Long, Double> userRatingAverages;
-	private Map<Map.Entry<Long, Long>, Double> itemSimilarityCache;
+	protected Map<Map.Entry<Long, Long>, Double> itemSimilarityCache;
 	private Map<Long, Map<Long, Rating>> trainingSetByItemAndUser;
 	private Map<Long, List<Rating>> trainingSetByUserId;
 	private Integer highestSimilarityItemOffset; // in slides = k
