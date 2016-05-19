@@ -28,27 +28,8 @@ public class ImdbMovieCrawler extends MovieCrawler {
 
 	private Pattern yearPattern = Pattern.compile("(\\(\\d\\d\\d\\d\\))");
 	
-	public Movie gatherMoreInformation(Movie movie) throws IOException {
-		List<CrawlerSearchResult> results = findSearchResults(movie);
-		CrawlerSearchResult bestResult = findBestSearchResult(movie, results);
-		if (bestResult == null) {
-			System.out.println("NOTHING FOUND  " + movie.getTitle() + " (" + movie.getYear() + ")");
-			notFoundMovies.add(movie);
-			return movie;
-		}
-		
-		int levenstein = bestResult.getLevenstein(movie);
-		int score = bestResult.computeScore(movie);
-		if (levenstein > 1) {
-			System.out.println(levenstein + " \t " + score + " \t " + movie.getTitle() + " (" + movie.getYear() + ")" + " - " + bestResult.title + " (" + bestResult.year + ")");
-		}
-		
-		String moviePageUrl = baseUrl + bestResult.href;
-		return gatherMoreInformationFromDetailPage(movie, moviePageUrl);
-	}
-
 	protected List<CrawlerSearchResult> findSearchResults(Movie movie, String query) throws UnsupportedEncodingException, IOException {
-		Document searchPage = getDocument(baseSearchUrl.replace(baseSearchUrlQueryPattern, URLEncoder.encode(query, "UTF-8")));
+		Document searchPage = getSearchPageDocument(query);
 		
 		List<CrawlerSearchResult> results = new ArrayList<>();
 		int rank = 1;

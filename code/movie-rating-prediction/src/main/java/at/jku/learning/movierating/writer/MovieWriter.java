@@ -64,6 +64,16 @@ public class MovieWriter {
 		pw.write("\t");
 
 		writeList(movie.getDirectors(), pw, "|");
+		pw.write("\t");
+		
+		if (movie.getRtText() != null) {
+			pw.write(movie.getRtText().replaceAll("\t", ""));
+		}
+		pw.write("\t");
+
+		if (movie.getRtDescription() != null) {
+			pw.write(movie.getRtDescription().replaceAll("\t", ""));
+		}
 	}
 
 	private void writeList(List<String> list, PrintWriter pw, String separator) {

@@ -17,6 +17,10 @@ public class Movie {
 	private List<String> actors;
 	private List<String> directors;
 
+	// Rotten tomatoes
+	private String rtText;
+	private String rtDescription;
+
 	public Long getId() {
 		return id;
 	}
@@ -95,6 +99,22 @@ public class Movie {
 
 	public void setDirectors(List<String> directors) {
 		this.directors = directors;
+	}
+
+	public String getRtText() {
+		return rtText;
+	}
+
+	public void setRtText(String rtText) {
+		this.rtText = rtText;
+	}
+
+	public String getRtDescription() {
+		return rtDescription;
+	}
+
+	public void setRtDescription(String rtDescription) {
+		this.rtDescription = rtDescription;
 	}
 
 	@Override

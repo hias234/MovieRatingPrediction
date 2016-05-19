@@ -102,6 +102,13 @@ public class MovieReader {
 			movie.setDirectors(Arrays.asList(lineParts[7].split("\\|")));
 		}
 		
+		if (lineParts.length > 8) {
+			movie.setRtText(lineParts[8]);
+		}
+		if (lineParts.length > 9) {
+			movie.setRtDescription(lineParts[9]);
+		}
+		
 		return movie;
 	}
 	

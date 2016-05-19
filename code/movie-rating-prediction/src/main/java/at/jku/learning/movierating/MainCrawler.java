@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import at.jku.learning.movierating.crawler.ImdbMovieCrawler;
+import at.jku.learning.movierating.crawler.MovieCrawler;
+import at.jku.learning.movierating.crawler.RottenTomatoesMovieCrawler;
 import at.jku.learning.movierating.model.Movie;
 import at.jku.learning.movierating.reader.MovieReader;
 import at.jku.learning.movierating.writer.MovieWriter;
@@ -22,10 +24,13 @@ public class MainCrawler {
 		List<Movie> movies = reader.readMovies(Main.class.getResourceAsStream("/movies.dat"));
 		
 		List<Movie> outMovies = new ArrayList<>();
-		ImdbMovieCrawler crawler = new ImdbMovieCrawler();
+		MovieCrawler imdbCrawler = new ImdbMovieCrawler();
+		MovieCrawler rtCrawler = new RottenTomatoesMovieCrawler();
 		for (int i = 0 ; i < movies.size(); i++) {
 			try {
-				outMovies.add(crawler.gatherMoreInformation(movies.get(i)));
+				Movie moreInfoMovie = imdbCrawler.gatherMoreInformation(movies.get(i));
+				moreInfoMovie = rtCrawler.gatherMoreInformation(moreInfoMovie);
+				outMovies.add(moreInfoMovie);
 			}
 			catch(IOException ex) {
 				ex.printStackTrace();
@@ -39,7 +44,12 @@ public class MainCrawler {
 
 		System.out.println();
 		System.out.println();
-		for (Movie notFound : crawler.getNotFoundMovies()) {
+		for (Movie notFound : imdbCrawler.getNotFoundMovies()) {
+			System.out.println(notFound);
+		}
+		System.out.println();
+		System.out.println();
+		for (Movie notFound : rtCrawler.getNotFoundMovies()) {
 			System.out.println(notFound);
 		}
 	}

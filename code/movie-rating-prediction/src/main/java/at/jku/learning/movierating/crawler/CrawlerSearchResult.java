@@ -12,10 +12,15 @@ public class CrawlerSearchResult {
 	public Integer year;
 	public String aka;
 	public String href;
+	public Boolean isDetailPage = false;
 	
 	public Integer computeScore(Movie movie) {
 		Integer score = 0;
 
+		if (isDetailPage) {
+			return 10000000;
+		}
+		
 		if (movie.getTitle().equalsIgnoreCase(title) || movie.getTitle().equalsIgnoreCase(aka)) {
 			score += 1000;
 		}
