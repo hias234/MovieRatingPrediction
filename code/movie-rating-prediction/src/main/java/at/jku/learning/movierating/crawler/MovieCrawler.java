@@ -31,6 +31,7 @@ public abstract class MovieCrawler {
 		CrawlerSearchResult bestResult = findBestSearchResult(movie, results);
 		if (bestResult == null) {
 			System.out.println("NOTHING FOUND  " + movie.getTitle() + " (" + movie.getYear() + ")");
+			System.out.println(getSearchUrl(movie.getTitle()));
 			notFoundMovies.add(movie);
 			return movie;
 		}
@@ -82,7 +83,15 @@ public abstract class MovieCrawler {
 	}
 
 	protected String getSearchUrl(String query) throws UnsupportedEncodingException {
-		return baseSearchUrl.replace(baseSearchUrlQueryPattern, URLEncoder.encode(query, "UTF-8"));
+		String encodedQuery = URLEncoder.encode(query, "UTF-8")
+                //.replaceAll("\\+", "%20")
+                //.replaceAll("\\%21", "!")
+                //.replaceAll("\\%27", "'")
+                //.replaceAll("\\%28", "(")
+                //.replaceAll("\\%29", ")")
+                .replaceAll("\\%7E", "~");
+		
+		return baseSearchUrl.replace(baseSearchUrlQueryPattern, encodedQuery);
 	}
 	
 	protected Document getDocument(String url) throws IOException {

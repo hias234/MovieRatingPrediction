@@ -69,6 +69,9 @@ public class MovieWriter {
 		if (movie.getRtText() != null) {
 			pw.write(movie.getRtText().replaceAll("\t", ""));
 		}
+		else {
+			pw.write(" ");
+		}
 		pw.write("\t");
 
 		if (movie.getRtDescription() != null) {
