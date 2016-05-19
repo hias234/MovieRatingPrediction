@@ -70,6 +70,24 @@ public abstract class MovieCrawler {
 			results.addAll(findSearchResults(movie, movie.getTitle() + " (" + movie.getYear() + ")"));
 		}
 		
+		if (results.isEmpty() && movie.getTitle2() != null) {
+			results.addAll(findSearchResults(movie, movie.getTitle2()));
+		}
+		
+		if (results.isEmpty()) {
+			String[] splitters = new String[] { ":", " - ", "..." };
+			for (int i = 0; i < splitters.length && results.isEmpty(); i++) {
+				String splitter = splitters[i];
+				if (movie.getTitle().contains(splitter)) {
+					String[] parts = movie.getTitle().split(splitter);
+					
+					for (String part : parts) {
+						results.addAll(findSearchResults(movie, part.trim()));
+					}
+				}
+			}
+		}
+		
 		return results;
 	}
 	

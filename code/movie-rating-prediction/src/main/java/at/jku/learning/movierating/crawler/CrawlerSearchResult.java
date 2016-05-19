@@ -57,17 +57,28 @@ public class CrawlerSearchResult {
 	}
 
 	int getLevenstein(Movie movie) {
+		int levenstein = getLevenstein(movie.getTitle());
+		
+		if (movie.getTitle2() != null) {
+			int levensteinTitle2 = getLevenstein(movie.getTitle2());
+			levenstein = Math.min(levenstein, levensteinTitle2);
+		}
+		
+		return levenstein;
+	}
+	
+	private int getLevenstein(String movieTitle) {
 		int levenstein;
-		int levensteinTitle = StringUtils.getLevenshteinDistance(movie.getTitle().toLowerCase(), title.toLowerCase());
+		int levensteinTitle = StringUtils.getLevenshteinDistance(movieTitle.toLowerCase(), title.toLowerCase());
 		if (aka != null) {
-			int levensteinAka = StringUtils.getLevenshteinDistance(movie.getTitle().toLowerCase(), aka.toLowerCase());
+			int levensteinAka = StringUtils.getLevenshteinDistance(movieTitle.toLowerCase(), aka.toLowerCase());
 			levenstein = Math.min(levensteinAka, levensteinTitle);
 			
 			if (aka.contains(": ") || aka.contains(" - ")) {
 				String shortAka = aka.split(": ")[0];
 				shortAka = shortAka.split(" - ")[0];
 				
-				int levensteinShortAka = StringUtils.getLevenshteinDistance(movie.getTitle().toLowerCase(), shortAka.toLowerCase());
+				int levensteinShortAka = StringUtils.getLevenshteinDistance(movieTitle.toLowerCase(), shortAka.toLowerCase());
 				levenstein = Math.min(levenstein, levensteinShortAka);
 			}
 		}
@@ -79,7 +90,7 @@ public class CrawlerSearchResult {
 			String shortTitle = title.split(": ")[0];
 			shortTitle = shortTitle.split(" - ")[0];
 			
-			int levensteinShortTitle = StringUtils.getLevenshteinDistance(movie.getTitle().toLowerCase(), shortTitle.toLowerCase());
+			int levensteinShortTitle = StringUtils.getLevenshteinDistance(movieTitle.toLowerCase(), shortTitle.toLowerCase());
 			levenstein = Math.min(levenstein, levensteinShortTitle);
 		}
 		

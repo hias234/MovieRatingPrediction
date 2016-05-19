@@ -147,6 +147,8 @@ public class MovieReader {
 			return "Das " + title.substring(0, title.length() - 5).trim();
 		}
 		
+		title = title.replaceAll("a\\.k\\.a\\.", "").trim();
+		
 		return title.trim();
 	}
 }
