@@ -6,10 +6,11 @@ import java.util.List;
 import java.util.Map;
 
 import at.jku.learning.movierating.prediction.PrecisePredictor;
+import at.jku.learning.movierating.prediction.Predictor;
 
 public class GnuPlot {
 	
-	public static void writeGnuPlot(List<Map.Entry<PrecisePredictor, Double>> data, String filename, String title) throws IOException {
+	public static void writeGnuPlot(List<Map.Entry<Predictor, Double>> data, String filename, String title) throws IOException {
 		int numOfColumns = data.size();
 		double minYValue = Double.POSITIVE_INFINITY;
 		double maxYValue = 0;
@@ -18,13 +19,13 @@ public class GnuPlot {
 		try (FileWriter fw = new FileWriter(filename + "data.dat", false)) {
 			// column titles
 			fw.write("-");
-			for (Map.Entry<PrecisePredictor, Double> item : data) {
+			for (Map.Entry<Predictor, Double> item : data) {
 				fw.write(" \"" + item.getKey().toString() + "\"");
 			}
 			fw.write(System.lineSeparator());
 			// data
 			fw.write("-"); // this would be the name of the data set (if there were more than one)
-			for (Map.Entry<PrecisePredictor, Double> item : data) {
+			for (Map.Entry<Predictor, Double> item : data) {
 				fw.write(" " + item.getValue().toString());
 				
 				if (item.getValue() < minYValue) {

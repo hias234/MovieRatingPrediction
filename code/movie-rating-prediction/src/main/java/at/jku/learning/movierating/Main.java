@@ -24,6 +24,7 @@ import at.jku.learning.movierating.model.Rating;
 import at.jku.learning.movierating.plot.GnuPlot;
 import at.jku.learning.movierating.prediction.MathRoundPrecisePredictor;
 import at.jku.learning.movierating.prediction.PrecisePredictor;
+import at.jku.learning.movierating.prediction.Predictor;
 import at.jku.learning.movierating.prediction.collaborative.memory.itembased.ItemBasedPredictor;
 import at.jku.learning.movierating.prediction.collaborative.memory.itembased.ItemBasedPredictorMovieData;
 import at.jku.learning.movierating.prediction.test.ConfigTester;
@@ -46,18 +47,18 @@ public class Main {
 		WeightedDocumentReader wdReader = new WeightedDocumentReader();
 		Map<Long, Map<String, Double>> weightedDocsTF_B_IDF_B = wdReader.readWeightedDocuments(new FileInputStream("weightedDoc1-TF_B-IDF_B.dat"));
 		Map<Long, Map<String, Double>> weightedDocsTF_D_IDF_B = wdReader.readWeightedDocuments(new FileInputStream("weightedDoc2-TF_D-IDF_B.dat"));
-		PrecisePredictor[] configs = {
+		Predictor[] configs = {
 				// TODO: all configs that should be tested; each one will pe displayed as a single column in one plot
-				new MathRoundPrecisePredictor(new ItemBasedPredictor(20)),
-				new MathRoundPrecisePredictor(new ItemBasedPredictorMovieData(20, weightedDocsTF_B_IDF_B, new SIM_COS())),
-				new MathRoundPrecisePredictor(new ItemBasedPredictorMovieData(20, weightedDocsTF_D_IDF_B, new SIM_COS())),
+				new ItemBasedPredictor(20),
+				new ItemBasedPredictorMovieData(20, weightedDocsTF_B_IDF_B, new SIM_COS()),
+				new ItemBasedPredictorMovieData(20, weightedDocsTF_D_IDF_B, new SIM_COS()),
 		};
 		double[] percentagesTrainingData = { 0.99999/*, 0.99995*/ };
 		long[] rndSeeds =                  { 1000L/*, 5312L*/ };
 		createMovieRatings(configs, percentagesTrainingData, rndSeeds);
 	}
 	
-	private static void createMovieRatings(PrecisePredictor[] configs, double[] percentagesTrainingData, long[] rndSeeds) throws IOException {
+	private static void createMovieRatings(Predictor[] configs, double[] percentagesTrainingData, long[] rndSeeds) throws IOException {
 		MovieRatingReader reader = new MovieRatingReader();
 		List<Rating> trainingData = reader.readRatings(Main.class.getResourceAsStream("/training.dat"));
 		// change if output is to be stored e.g. in a file
@@ -70,7 +71,7 @@ public class Main {
 			Random rnd = new Random(rndSeeds[i]);
 			PredictorTester pTester = new PredictorTester(trainingData, percentagesTrainingData[i], rnd/*, out*/);
 			ConfigTester cTester = new ConfigTester(out);
-			List<Entry<PrecisePredictor, Double>> result = cTester.testConfigs(pTester, configs);
+			List<Entry<Predictor, Double>> result = cTester.testConfigs(pTester, configs);
 			result.forEach(e -> out.println(e.getKey() + " " + e.getValue()));
 			GnuPlot.writeGnuPlot(result, "config" + percentagesTrainingData[i], String.format("RMSE for different configurations with training size %2.3f%%", 100 * percentagesTrainingData[i]));
 			out.println("Main createMovieRatings: " + (i + 1) + "/" + percentagesTrainingData.length);

@@ -13,6 +13,7 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import at.jku.learning.movierating.prediction.PrecisePredictor;
+import at.jku.learning.movierating.prediction.Predictor;
 
 public class ConfigTester {
 	
@@ -26,7 +27,7 @@ public class ConfigTester {
 		this.out = out;
 	}
 	
-	public List<Entry<PrecisePredictor, Double>> testConfigs(PredictorTester tester, PrecisePredictor... predictors) {
+	public List<Entry<Predictor, Double>> testConfigs(PredictorTester tester, Predictor... predictors) {
 		long startTime = System.currentTimeMillis();
 		
 		int threadPoolSize = Runtime.getRuntime().availableProcessors();
@@ -35,13 +36,13 @@ public class ConfigTester {
 		}
 		final AtomicInteger doneTasks = new AtomicInteger();
 		ExecutorService executor = Executors.newFixedThreadPool(threadPoolSize);
-		List<FutureTask<List<Map.Entry<PrecisePredictor, Double>>>> tasks = new ArrayList<>();
+		List<FutureTask<List<Map.Entry<Predictor, Double>>>> tasks = new ArrayList<>();
 		
-		for (PrecisePredictor p : predictors) {
-			FutureTask<List<Map.Entry<PrecisePredictor, Double>>> task = new FutureTask<>(new Callable<List<Map.Entry<PrecisePredictor, Double>>>() {
+		for (Predictor p : predictors) {
+			FutureTask<List<Map.Entry<Predictor, Double>>> task = new FutureTask<>(new Callable<List<Map.Entry<Predictor, Double>>>() {
 				@Override
-				public List<Entry<PrecisePredictor, Double>> call() throws Exception {
-					List<Entry<PrecisePredictor, Double>> data = null;
+				public List<Entry<Predictor, Double>> call() throws Exception {
+					List<Entry<Predictor, Double>> data = null;
 					// make sure we don't crash; if there is an exception, just exclude this
 					// predictor by returning null
 					Exception ex = null;
@@ -69,9 +70,9 @@ public class ConfigTester {
 			tasks.add(task);
 		}
         
-        List<Map.Entry<PrecisePredictor, Double>> result = new ArrayList<>();
-		for (FutureTask<List<Map.Entry<PrecisePredictor, Double>>> task : tasks) {
-			List<Entry<PrecisePredictor, Double>> singleResult = null;
+        List<Map.Entry<Predictor, Double>> result = new ArrayList<>();
+		for (FutureTask<List<Map.Entry<Predictor, Double>>> task : tasks) {
+			List<Entry<Predictor, Double>> singleResult = null;
 			try {
 				singleResult = task.get();
 			} catch (InterruptedException | ExecutionException e) {

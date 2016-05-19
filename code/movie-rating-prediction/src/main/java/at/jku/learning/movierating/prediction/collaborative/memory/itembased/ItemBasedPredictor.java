@@ -62,6 +62,10 @@ public class ItemBasedPredictor implements Predictor {
 			b += mostSimilarItems.get(item);
 		}
 
+		if (b == 0.0) {
+			System.out.println("ERROR no items to compare - or all similar items have similarity 0.0");
+			return 4.0;
+		}
 		return a / b;
 	}
 
