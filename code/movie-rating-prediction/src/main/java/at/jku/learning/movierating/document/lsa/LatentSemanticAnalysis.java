@@ -14,13 +14,17 @@ import org.apache.commons.math3.linear.SingularValueDecomposition;
 
 
 public class LatentSemanticAnalysis implements LSA{
-  private final int kFeatures; //Features
+  private int kFeatures; //Features
   private final Map<Long, Map<String, Double>> weightedDocs;
   private final Set<String> allTerms = new HashSet<String>(); 
   private RealMatrix model;
+  private RealMatrix documentMatrix;
+  private RealMatrix termMatrix;
+  private RealMatrix sigmaMatrix;
   
-  public LatentSemanticAnalysis(int k, Map<Long, Map<String, Double>> weightedDocs) {
-    this.kFeatures = k;
+  
+  public LatentSemanticAnalysis(Map<Long, Map<String, Double>> weightedDocs) {
+
     this.weightedDocs = weightedDocs;
     this.computeModelCorpus();
     this.performSVD();
@@ -79,23 +83,32 @@ public class LatentSemanticAnalysis implements LSA{
     SingularValueDecomposition svd = new SingularValueDecomposition(xMatrix);
     
     
-    RealMatrix documentMatrix = svd.getU(); //Eigenvectors D
-    RealMatrix termMatrix = svd.getV(); //Eigenvectors T
-    RealMatrix sigmaMatrix = svd.getS(); //Eigenvalues
+    documentMatrix = svd.getU(); //Eigenvectors D
+    termMatrix = svd.getV(); //Eigenvectors T
+    sigmaMatrix = svd.getS(); //Eigenvalues
     
+    /*
     //Get shortened SubMatrix with k-Ranks.
-    //TODO automatically sorted?
     sigmaMatrix = sigmaMatrix.getSubMatrix(1, kFeatures, 1, kFeatures);
     documentMatrix = documentMatrix.getSubMatrix(1, documentMatrix.getRowDimension(), 1, kFeatures);
     termMatrix = termMatrix.getSubMatrix(1, documentMatrix.getRowDimension(), 1, kFeatures);
     
     //Multiply T * S * D(T) = Original Matrix with Dimensionality reduction through k
     this.setModel(termMatrix.multiply(documentMatrix.transpose().preMultiply(sigmaMatrix)));
+    */
   }
   
-  public Map<Long, Map<String, Double>>  getWeightedDocs() {
+  public Map<Long, Map<String, Double>>  getWeightedDocs(int k){
     
-    RealMatrix svdMatrix = getModel();
+    this.kFeatures = k;
+    
+    //Get shortened SubMatrix with k-Ranks.
+    sigmaMatrix = sigmaMatrix.getSubMatrix(1, kFeatures, 1, kFeatures);
+    documentMatrix = documentMatrix.getSubMatrix(1, documentMatrix.getRowDimension(), 1, kFeatures);
+    termMatrix = termMatrix.getSubMatrix(1, documentMatrix.getRowDimension(), 1, kFeatures);
+    
+    //Multiply T * S * D(T) = Original Matrix with Dimensionality reduction through k
+    RealMatrix svdMatrix = termMatrix.multiply(documentMatrix.transpose().preMultiply(sigmaMatrix));
     
     double[][] data = svdMatrix.getData();
     
