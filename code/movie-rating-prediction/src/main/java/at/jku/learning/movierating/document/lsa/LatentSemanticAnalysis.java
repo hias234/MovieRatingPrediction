@@ -2,6 +2,7 @@ package at.jku.learning.movierating.document.lsa;
 
 import org.apache.commons.math3.linear.RealMatrix;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -103,15 +104,15 @@ public class LatentSemanticAnalysis implements LSA{
     this.kFeatures = k;
     
     //Get shortened SubMatrix with k-Ranks.
-    sigmaMatrix = sigmaMatrix.getSubMatrix(1, kFeatures, 1, kFeatures);
-    documentMatrix = documentMatrix.getSubMatrix(1, documentMatrix.getRowDimension(), 1, kFeatures);
-    termMatrix = termMatrix.getSubMatrix(1, documentMatrix.getRowDimension(), 1, kFeatures);
+    sigmaMatrix = sigmaMatrix.getSubMatrix(0, kFeatures-1, 0, kFeatures-1);
+    documentMatrix = documentMatrix.getSubMatrix(0, documentMatrix.getRowDimension()-1, 0, kFeatures-1);
+    termMatrix = termMatrix.getSubMatrix(0, documentMatrix.getRowDimension()-1, 0, kFeatures-1);
     
     //Multiply T * S * D(T) = Original Matrix with Dimensionality reduction through k
     RealMatrix svdMatrix = termMatrix.multiply(documentMatrix.transpose().preMultiply(sigmaMatrix));
     
     double[][] data = svdMatrix.getData();
-    
+    Map<Long, Map<String, Double>> reducedWeightedDocs = new HashMap<Long, Map<String, Double>>();
     int i=0;
     
     for(Entry<Long, Map<String, Double>> entry: weightedDocs.entrySet()) {
@@ -120,14 +121,14 @@ public class LatentSemanticAnalysis implements LSA{
       Map<String,Double> termMap = entry.getValue();
       
       for(String term : allTerms) {
-        data[i][j] = termMap.containsKey(term) ? termMap.put(term, data[i][j]) : null;
-        j++;
+          data[i][j] = termMap.containsKey(term) ? termMap.put(term, data[i][j]) : null;
+          j++;
       }
       i++;
+      reducedWeightedDocs.put(entry.getKey(), termMap);
     }
     
-    
-    return weightedDocs;
+    return reducedWeightedDocs;
   }
   
   
